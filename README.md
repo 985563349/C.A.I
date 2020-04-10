@@ -1,29 +1,4 @@
-# c.a.i
+# C.A.I
 
-## Project setup
-```
-yarn install
-```
+> :alien: C.A.I，出自日漫《家庭教师HITMAN REBORN!》，全称Cambio Arma Istantaneo（瞬时武装换装系统）。
 
-### Compiles and hot-reloads for development
-```
-yarn run serve
-```
-
-### Compiles and minifies for production
-```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
