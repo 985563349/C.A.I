@@ -24,7 +24,7 @@ request.interceptors.response.use(response => {
 
     return Promise.reject(res.message || 'Error')
   } else {
-    return res
+    return res.data
   }
 }, error => {
   return Promise.reject(error)

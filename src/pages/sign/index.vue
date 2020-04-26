@@ -42,8 +42,6 @@
 </template>
 
 <script>
-import { signIn } from '@/api/modules/user'
-
 export default {
   name: 'Sign',
   data () {
@@ -75,11 +73,11 @@ export default {
           this.signInLoading = true
           const { username, password } = this.userData
           try {
-            // this.$dispatch('user/signIn', { username, password })
-            const { data } = await signIn({ username, password })
-            console.log(data)
-            this.signInLoading = false
-          } catch {
+            await this.$store.dispatch('user/signIn', { username, password })
+            this.$router.replace({ path: '/home' })
+          } catch (e) {
+            console.log(e)
+          } finally {
             this.signInLoading = false
           }
         } else {
@@ -93,14 +91,12 @@ export default {
 
 <style scoped lang="scss">
   .sign {
-    position: relative;
-    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
     background: #f3f3f3;
     &-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       display: flex;
       border-radius: 4px;
       width: 1100px;
