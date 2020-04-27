@@ -12,8 +12,13 @@ const writeRoutes = ['/sign-in']
 
 router.beforeEach((to, from, next) => {
   nprogress.start()
+
   if (store.getters['user/token']) {
-    next()
+    if (to.path === '/sign-in') {
+      next({ path: '/home' })
+    } else {
+      next()
+    }
   } else {
     if (writeRoutes.includes(to.path)) {
       next()
