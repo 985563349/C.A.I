@@ -1,12 +1,27 @@
 <template>
-  <span class="fold">
-    <i class="el-icon-s-fold"></i>
+  <span :class="[
+    'fold',
+    {
+      'fold--active': isFold
+    }
+  ]" @click="handleClick">
+    <svg-icon iconClass="indent" />
   </span>
 </template>
 
 <script>
 export default {
-  name: 'Fold'
+  name: 'Fold',
+  data () {
+    return {
+      isFold: false
+    }
+  },
+  methods: {
+    handleClick () {
+      this.isFold = !this.isFold
+    }
+  }
 }
 </script>
 
@@ -14,10 +29,13 @@ export default {
 .fold {
   display: inline-block;
   padding: 10px;
-  font-size: 22px;
+  font-size: 18px;
   cursor: pointer;
   &:hover {
     color: #409EFF;
+  }
+  &--active {
+    transform: rotateY(180deg);
   }
 }
 </style>

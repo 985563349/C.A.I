@@ -18,7 +18,7 @@ export default {
 .header {
   height: 64px;
   .fold {
-    padding: 0 20px;
+    padding: 0 22px;
     line-height: 64px;
   }
   .header-tool {

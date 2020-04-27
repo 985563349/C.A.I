@@ -1,6 +1,6 @@
 <template>
   <span class="fullscreen" @click="handleClick">
-    <i class="el-icon-full-screen"></i>
+    <svg-icon :icon-class="isFullscreen ? 'fullscreen-exit' : 'fullscreen'" />
   </span>
 </template>
 
@@ -27,7 +27,7 @@ export default {
 .fullscreen {
   display: inline-block;
   padding: 10px;
-  font-size: 22px;
+  font-size: 18px;
   cursor: pointer;
   &:hover {
     color: #409EFF;
