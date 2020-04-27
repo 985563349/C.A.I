@@ -2,27 +2,23 @@
   <el-container>
     <el-aside width="200px">Aside</el-aside>
 
-    <el-container>
-      <el-header>Header</el-header>
+    <el-container class="is-vertical">
+      <Header height="64px">
+        <Fullscreen />
+        <Fullscreen />
+        <Fullscreen />
+      </Header>
 
       <el-main>
         <router-view />
       </el-main>
-
-      <el-footer>Footer</el-footer>
     </el-container>
   </el-container>
 </template>
 
 <style scoped lang="scss">
   .el-container {
-    height: 100%;
-    .el-header, .el-footer {
-      background-color: #B3C0D1;
-      color: #333;
-      text-align: center;
-      line-height: 60px;
-    }
+    height: 100vh;
     .el-aside {
       display: flex;
       align-items: center;

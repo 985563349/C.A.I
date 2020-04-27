@@ -10,13 +10,15 @@ import '@/router/permission'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
+import '@/components'
+
 Vue.config.productionTip = false
 
 Vue.use(ElementUI)
 
-const ENV = process.env.NODE_ENV
+const isDev = process.env.NODE_ENV === 'development'
 
-if (ENV !== 'production') {
+if (isDev) {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
