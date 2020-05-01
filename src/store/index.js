@@ -21,7 +21,15 @@ export default new Vuex.Store({
   },
   getters,
   plugins: [
-    createPersistedState()
+    createPersistedState({
+      reducer: (state) => {
+        return {
+          user: {
+            token: state.user.token
+          }
+        }
+      }
+    })
   ]
     .concat(isDEV ? [createLogger()] : [])
 })

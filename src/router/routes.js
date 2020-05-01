@@ -1,6 +1,6 @@
 import Layout from '@/layout'
 
-const routes = [
+export const constantRoutes = [
   {
     path: '/sign-in',
     component: () => import('@/pages/sign'),
@@ -28,7 +28,10 @@ const routes = [
         component: () => import('@/pages/home')
       }
     ]
-  },
+  }
+]
+
+export const asyncRoutes = [
   {
     path: '/component',
     component: Layout,
@@ -44,6 +47,41 @@ const routes = [
         path: 'tree-transfer',
         title: '树形穿梭框',
         component: () => import('@/pages/components/tree-transfer')
+      }
+    ]
+  },
+  {
+    path: '/position',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        title: '地理定位',
+        icon: 'location-fill',
+        component: () => import('@/pages/position')
+      }
+    ]
+  },
+  {
+    path: '/permission',
+    component: Layout,
+    title: '权限测试页',
+    icon: 'lock-fill',
+    children: [
+      {
+        path: 'page',
+        title: '页面权限',
+        meta: {
+          roles: ['admin']
+        }
+      },
+      {
+        path: 'directive',
+        title: '指令权限'
+      },
+      {
+        path: 'role',
+        title: '角色权限'
       }
     ]
   },
@@ -86,7 +124,28 @@ const routes = [
         title: '菜单2'
       }
     ]
+  },
+  {
+    path: '/error',
+    component: Layout,
+    title: '错误页面',
+    icon: 'error-fill',
+    children: [
+      {
+        path: '404',
+        title: '404',
+        component: () => import('@/pages/error-page/404')
+      },
+      {
+        path: '401',
+        title: '401',
+        component: () => import('@/pages/error-page/401')
+      }
+    ]
+  },
+  {
+    path: '*',
+    redirect: '/404',
+    hidden: true
   }
 ]
-
-export default routes

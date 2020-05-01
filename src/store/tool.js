@@ -1,4 +1,5 @@
 import path from 'path'
+// import { deepClone } from '@/assets/utils/tool'
 
 class MenuItem {
   constructor ({ path, title, icon, children }) {
@@ -11,11 +12,34 @@ class MenuItem {
 
 const resolvePath = path.join
 
-export const generateRoutesByRole = (routes, role) => {}
+export const generateRoutesByRole = (routes, role) => {
+  // 超级管理员可访问所有路由
+  if (role === 'admin') {
+    return routes
+  }
+
+  const loop = routeList => {
+    return routeList.reduce((prev, route) => {
+      if (route?.meta?.roles && !route?.meta?.roles.includes(role)) {
+        return prev
+      }
+
+      if (route.children) {
+        route.children = loop(route.children)
+        route.children.length > 0 && prev.push(route)
+      } else {
+        prev.push(route)
+      }
+      return prev
+    }, [])
+  }
+
+  return loop(routes)
+}
 
 export const generateRoutesByLimit = (routes, limit) => {}
 
-export const generateMenuListByRole = routes => {
+export const generateMenuList = routes => {
   const res = []
 
   const loop = (routeList, basePath, prev) => {

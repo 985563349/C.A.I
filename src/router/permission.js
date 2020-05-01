@@ -13,13 +13,13 @@ const writeRoutes = ['/sign-in']
 router.beforeEach(async (to, from, next) => {
   nprogress.start()
 
-  const { token, routes } = store.getters
+  const { token, roleRoutes } = store.getters
 
   if (token) {
     if (to.path === '/sign-in') {
       next({ path: '/home' })
     } else {
-      const hasRoutes = routes?.length > 0
+      const hasRoutes = roleRoutes?.length > 0
       if (hasRoutes) {
         next()
       } else {
@@ -29,10 +29,9 @@ router.beforeEach(async (to, from, next) => {
           // 生成路由
           const roleRoutes = await store.dispatch('user/generateRoutes', userInfo)
           // 动态挂载路由
-          // 生成菜单栏数据
-          store.dispatch('user/generateMenuList', roleRoutes)
+          router.addRoutes(roleRoutes)
           // 跳转
-          next()
+          next({ ...to, replace: true })
         } catch (error) {
           console.log(error)
         }
