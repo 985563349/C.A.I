@@ -10,14 +10,33 @@ nprogress.configure({
 
 const writeRoutes = ['/sign-in']
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   nprogress.start()
 
-  if (store.getters['user/token']) {
+  const { token, routes } = store.getters
+
+  if (token) {
     if (to.path === '/sign-in') {
       next({ path: '/home' })
     } else {
-      next()
+      const hasRoutes = routes?.length > 0
+      if (hasRoutes) {
+        next()
+      } else {
+        try {
+          // 请求用户信息
+          const userInfo = await store.dispatch('user/getUserInfo')
+          // 生成路由
+          const roleRoutes = await store.dispatch('user/generateRoutes', userInfo)
+          // 动态挂载路由
+          // 生成菜单栏数据
+          store.dispatch('user/generateMenuList', roleRoutes)
+          // 跳转
+          next()
+        } catch (error) {
+          console.log(error)
+        }
+      }
     }
   } else {
     if (writeRoutes.includes(to.path)) {

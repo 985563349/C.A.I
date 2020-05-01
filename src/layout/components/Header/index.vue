@@ -1,9 +1,9 @@
 <template>
   <header class="header">
-    <Fold />
+    <slot class="fold"></slot>
 
     <div class="header-tool">
-      <slot></slot>
+      <slot name="tool"></slot>
     </div>
   </header>
 </template>

@@ -26,6 +26,19 @@ export default [
     }
   },
   {
+    url: '/api/userInfo',
+    method: 'get',
+    response: {
+      code: 0,
+      data: {
+        nickname: '王花花',
+        avatar: '@image(100x100)',
+        role: 'admin'
+      },
+      message: '请求成功'
+    }
+  },
+  {
     url: '/api/test',
     method: 'get',
     response () {

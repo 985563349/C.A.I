@@ -8,13 +8,9 @@ export function signIn (data) {
   })
 }
 
-export function test () {
+export function getUserInfo () {
   return request({
-    url: '/test',
-    method: 'get',
-    params: {
-      a: 'a',
-      b: 'b'
-    }
+    url: '/userInfo',
+    method: 'get'
   })
 }

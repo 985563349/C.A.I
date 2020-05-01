@@ -2,7 +2,7 @@
   <span :class="[
     'fold',
     {
-      'fold--active': isFold
+      'fold--active': value
     }
   ]" @click="handleClick">
     <svg-icon iconClass="indent" />
@@ -12,14 +12,18 @@
 <script>
 export default {
   name: 'Fold',
-  data () {
-    return {
-      isFold: false
+  model: {
+    event: 'change'
+  },
+  props: {
+    value: {
+      type: Boolean,
+      required: true
     }
   },
   methods: {
     handleClick () {
-      this.isFold = !this.isFold
+      this.$emit('change', !this.value)
     }
   }
 }
@@ -31,11 +35,12 @@ export default {
   padding: 10px;
   font-size: 18px;
   cursor: pointer;
+  transform: rotateY(180deg);
   &:hover {
     color: #409EFF;
   }
   &--active {
-    transform: rotateY(180deg);
+    transform: rotateY(0);
   }
 }
 </style>
