@@ -50,7 +50,6 @@ const user = {
     },
     generateMenuList: ({ dispatch }, routes) => {
       const menuList = generateMenuList(routes)
-      console.log(menuList)
       // 提交至app模块
       dispatch('app/setMenuList', menuList, { root: true })
     }

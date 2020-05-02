@@ -6,7 +6,7 @@ class MenuItem {
     this.path = path
     this.title = title
     this.icon = icon
-    this.children = children
+    children && (this.children = children)
   }
 }
 
@@ -30,6 +30,7 @@ export const generateRoutesByRole = (routes, role) => {
       } else {
         prev.push(route)
       }
+
       return prev
     }, [])
   }
@@ -58,8 +59,6 @@ export const generateMenuList = routes => {
           Object.assign(menuItem, rootMenuItem, { path: resolvePath(basePath, menuItem.path, rootMenuItem.path) })
           Reflect.deleteProperty(menuItem, 'children')
         }
-      } else {
-        Reflect.deleteProperty(menuItem, 'children')
       }
 
       prev.push(menuItem)

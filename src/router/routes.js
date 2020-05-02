@@ -83,17 +83,20 @@ export const asyncRoutes = [
       {
         path: 'page',
         title: '页面权限',
+        component: () => import('@/pages/permission/page'),
         meta: {
           roles: ['admin']
         }
       },
       {
         path: 'directive',
-        title: '指令权限'
+        title: '指令权限',
+        component: () => import('@/pages/permission/directive')
       },
       {
         path: 'role',
-        title: '角色权限'
+        title: '角色权限',
+        component: () => import('@/pages/permission/role')
       }
     ]
   },
