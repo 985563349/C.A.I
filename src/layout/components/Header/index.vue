@@ -1,6 +1,8 @@
 <template>
   <header class="header">
-    <slot class="fold"></slot>
+    <div class="header-trigger">
+      <slot></slot>
+    </div>
 
     <div class="header-tool">
       <slot name="tool"></slot>
@@ -16,22 +18,23 @@ export default {
 
 <style lang="scss" scoped>
 .header {
+  display: flex;
+  justify-content: space-between;
   height: 64px;
-  .fold {
-    padding: 0 22px;
-    line-height: 64px;
+  .header-trigger {
+    display: flex;
+    & > * {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 20px;
+    }
   }
   .header-tool {
-    // display: flex;
-    float: right;
+    display: flex;
     padding: 0 20px;
-    height: 100%;
     & > * {
-      display: inline-block;
-      height: 100%;
-      // align-items: center;
-      vertical-align: text-bottom;
-      line-height: 64px;
+      display: inline-flex;
+      align-items: center;
       padding: 0 12px;
       cursor: pointer;
       &:hover {
