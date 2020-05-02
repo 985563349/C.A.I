@@ -22,13 +22,18 @@ export default {
     line-height: 64px;
   }
   .header-tool {
-    display: flex;
-    align-items: center;
+    // display: flex;
     float: right;
     padding: 0 20px;
-    line-height: 64px;
+    height: 100%;
     & > * {
+      display: inline-block;
+      height: 100%;
+      // align-items: center;
+      vertical-align: text-bottom;
+      line-height: 64px;
       padding: 0 12px;
+      cursor: pointer;
       &:hover {
         background-color: rgba(0, 0, 0, .025);
       }

@@ -1,4 +1,4 @@
-import { signIn, getUserInfo } from '@/api/modules/user'
+import { signIn, logout, getUserInfo } from '@/api/modules/user'
 import { generateRoutesByRole, generateMenuList } from '@/store/tool'
 import { constantRoutes, asyncRoutes } from '@/router/routes'
 
@@ -19,6 +19,16 @@ const user = {
       const data = await signIn(userData)
       commit('SET_TOKEN', data.token)
       return data
+    },
+    logout: async ({ commit }) => {
+      try {
+        await logout()
+        // 清除用户token、用户路由
+        commit('SET_TOKEN', '')
+        commit('SET_ROLE_ROUTES', [])
+      } catch (e) {
+        return Promise.reject(e)
+      }
     },
     getUserInfo: async ({ commit }) => {
       try {

@@ -1,6 +1,6 @@
 import request from '@/api'
 
-export function signIn (data) {
+export const signIn = data => {
   return request({
     url: '/signIn',
     method: 'POST',
@@ -8,7 +8,14 @@ export function signIn (data) {
   })
 }
 
-export function getUserInfo () {
+export const logout = () => {
+  return request({
+    url: '/logout',
+    method: 'post'
+  })
+}
+
+export const getUserInfo = () => {
   return request({
     url: '/userInfo',
     method: 'get'

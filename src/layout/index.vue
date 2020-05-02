@@ -16,8 +16,22 @@
 
         <template #tool>
           <Fullscreen />
-          <Fullscreen />
-          <Fullscreen />
+
+          <el-dropdown size="small">
+            <el-avatar :src="userInfo.avatar"/>
+            <el-dropdown-menu slot="dropdown">
+              <router-link to="/profile/index">
+                <el-dropdown-item>个人中心</el-dropdown-item>
+              </router-link>
+              <router-link to="/">
+                <el-dropdown-item>首页</el-dropdown-item>
+              </router-link>
+              <a target="_blank" href="https://github.com/985563349/C.A.I">
+                <el-dropdown-item>项目地址</el-dropdown-item>
+              </a>
+              <el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </Header>
 
@@ -41,6 +55,7 @@ export default {
   },
   computed: {
     ...mapGetters([
+      'userInfo',
       'isCollapse',
       'menuList'
     ]),
@@ -54,6 +69,10 @@ export default {
   methods: {
     handleChange (status) {
       this.$store.dispatch('app/setIsCollapse', status)
+    },
+    async logout () {
+      await this.$store.dispatch('user/logout')
+      this.$router.push('/sign-in')
     }
   }
 }

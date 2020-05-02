@@ -12,7 +12,7 @@ export default [
           data: {
             token: 'token'
           },
-          message: '获取数据成功'
+          message: '登录成功'
         }
       } else {
         result = {
@@ -23,6 +23,15 @@ export default [
       }
 
       return result
+    }
+  },
+  {
+    url: '/api/logout',
+    method: 'post',
+    response: {
+      code: 0,
+      data: null,
+      message: '退出登录成功'
     }
   },
   {

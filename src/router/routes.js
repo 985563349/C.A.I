@@ -28,6 +28,18 @@ export const constantRoutes = [
         component: () => import('@/pages/home')
       }
     ]
+  },
+  {
+    path: '/profile',
+    redirect: '/profile/index',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/pages/profile')
+      }
+    ]
   }
 ]
 
