@@ -114,14 +114,11 @@ export const asyncRoutes = [
           {
             path: 'menu1-2',
             title: '菜单1-2',
+            alwaysShow: true,
             children: [
               {
                 path: 'menu1-2-1',
                 title: '菜单1-2-1'
-              },
-              {
-                path: 'menu1-2-2',
-                title: '菜单1-2-2'
               }
             ]
           },

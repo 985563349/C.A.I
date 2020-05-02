@@ -40,37 +40,33 @@ export const generateRoutesByRole = (routes, role) => {
 export const generateRoutesByLimit = (routes, limit) => {}
 
 export const generateMenuList = routes => {
-  const res = []
-
-  const loop = (routeList, basePath, prev) => {
-    routeList.forEach(route => {
+  const loop = (routeList, basePath) => {
+    return routeList.reduce((prev, route) => {
       if (route.hidden) {
-        return
+        return prev
       }
 
-      const foo = new MenuItem(route)
-      const children = route.children
+      const menuItem = new MenuItem(route)
+      menuItem.path = resolvePath(basePath, menuItem.path)
+      const children = menuItem.children
 
       if (children?.length > 0) {
-        // 路由晋升，当前路由下只有一个子路由，自动晋升为根路由
-        if (children.length === 1) {
-          const rootRoute = children[0]
-          const path = resolvePath(basePath, foo.path, rootRoute.path)
-          Object.assign(foo, { ...rootRoute, path })
-          Reflect.deleteProperty(foo, 'children')
-        } else {
-          foo.children = []
-          loop(children, route.path, foo.children)
+        menuItem.children = loop(children, menuItem.path)
+        // 处理路由晋升
+        if (!route.alwaysShow && children.length === 1) {
+          const rootMenuItem = children[0]
+          Object.assign(menuItem, rootMenuItem, { path: resolvePath(basePath, menuItem.path, rootMenuItem.path) })
+          Reflect.deleteProperty(menuItem, 'children')
         }
       } else {
-        foo.path = resolvePath(basePath, foo.path)
-        Reflect.deleteProperty(foo, 'children')
+        Reflect.deleteProperty(menuItem, 'children')
       }
 
-      prev.push(foo)
-    })
+      prev.push(menuItem)
+
+      return prev
+    }, [])
   }
 
-  loop(routes, '', res)
-  return res
+  return loop(routes, '')
 }

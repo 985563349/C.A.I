@@ -14,7 +14,7 @@ Vue.use(Vuex)
 const isDEV = process.env.NODE_ENV === 'development'
 
 export default new Vuex.Store({
-  strict: true,
+  // strict: true,
   modules: {
     app,
     user
