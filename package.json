@@ -6,6 +6,8 @@
     "serve": "vue-cli-service serve",
     "test": "vue-cli-service build --mode testing",
     "build": "vue-cli-service build",
+    "predeploy": "yarn test",
+    "deploy": "gh-pages -d dist",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -32,6 +34,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.2.2",
+    "gh-pages": "^2.2.0",
     "node-sass": "^4.12.0",
     "sass-loader": "^8.0.2",
     "svg-sprite-loader": "^4.2.6",
@@ -55,5 +58,6 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "homepage": "https://985563349.github.io/C.A.I"
 }
