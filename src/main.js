@@ -17,10 +17,15 @@ Vue.config.productionTip = false
 
 Vue.use(ElementUI)
 
-if (process.env.NODE_ENV !== 'development') {
-  const { mockXHR } = require('../mock')
-  mockXHR()
-}
+// const isDev = process.env.NODE_ENV === 'development'
+
+const { mockXHR } = require('../mock')
+mockXHR()
+
+// if (isDev) {
+//   const { mockXHR } = require('../mock')
+//   mockXHR()
+// }
 
 new Vue({
   router,
