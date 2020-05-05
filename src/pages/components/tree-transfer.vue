@@ -2,6 +2,8 @@
   <div>
     <el-tree-transfer
       :data="data"
+      node-key="id"
+      :props="defaultProps"
       filterable
       filter-placeholder="请输入搜索内容"
       :titles="['Source', 'Target']"
@@ -19,6 +21,7 @@ export default {
         {
           id: 1,
           label: '一级 1',
+          disabled: true,
           children: [
             {
               id: 4,
@@ -64,7 +67,12 @@ export default {
             }
           ]
         }
-      ]
+      ],
+      defaultProps: {
+        label: 'label',
+        children: 'children',
+        disabled: 'disabled'
+      }
     }
   }
 }

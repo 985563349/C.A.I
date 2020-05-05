@@ -2,7 +2,9 @@
   <div class="el-transfer-panel">
     <p class="el-transfer-panel__header">
       <el-checkbox
-       v-model="allChecked">
+       v-model="allChecked"
+       :indeterminate="isIndeterminate"
+        @change="handleAllCheckedChange">
         {{ title }}
       </el-checkbox>
     </p>
@@ -24,6 +26,8 @@
       <div :class="['el-transfer-panel__list', { 'is-filterable': filterable }]">
         <el-tree
           :data="data"
+          :node-key="nodeKey"
+          :props="props"
           show-checkbox
           @check-change="handleCheckChange"
           :filter-node-method="filterNode"
@@ -38,6 +42,9 @@
 </template>
 
 <script>
+import { bfs } from '@/assets/utils/tool'
+const dataMap = new Map()
+
 export default {
   name: 'ElTreeTransferPanel',
   props: {
@@ -47,8 +54,28 @@ export default {
         return []
       }
     },
-    placeholder: String,
-    title: String,
+    nodeKey: {
+      type: String,
+      default: 'id'
+    },
+    props: {
+      type: Object,
+      default () {
+        return {
+          label: 'label',
+          children: 'children',
+          disabled: 'disabled'
+        }
+      }
+    },
+    placeholder: {
+      type: String,
+      default: ''
+    },
+    title: {
+      type: String,
+      default: ''
+    },
     filterable: Boolean,
     filterMethod: Function
   },
@@ -62,6 +89,10 @@ export default {
     }
   },
   computed: {
+    isIndeterminate () {
+      const checkedLength = this.checked.length
+      return checkedLength > 0 && checkedLength < dataMap.size
+    },
     hasFooter () {
       return !!this.$slots.default
     },
@@ -72,16 +103,35 @@ export default {
     }
   },
   watch: {
+    data: {
+      handler (val, oldVal) {
+        // 遍历生成checkedMap
+        bfs(val, item => {
+          dataMap.set(item.id, item)
+        })
+      },
+      immediate: true
+    },
     filterText (val) {
       this.$refs.tree.filter(val)
     }
   },
   methods: {
+    handleAllCheckedChange (value) {
+      const checkedNodes = value ? [...dataMap.values()] : []
+      this.$refs.tree.setCheckedNodes(checkedNodes)
+    },
+    updateAllChecked () {
+      const checkedLength = this.checked.length
+      this.allChecked = checkedLength > 0 && checkedLength === dataMap.size
+    },
     handleCheckChange (data, checked, indeterminate) {
       if (!this.checkChangeLimit) {
         this.checkChangeLimit = true
         this.$nextTick(() => {
           this.checked = this.$refs.tree.getCheckedNodes()
+          this.updateAllChecked()
+          this.$emit('checked-change', this.checked)
           this.checkChangeLimit = false
         })
       }

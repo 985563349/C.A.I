@@ -5,7 +5,8 @@
         v-bind="$props"
         :data="sourceData"
         :title="titles[0] || '列表1'"
-        :placeholder="filterPlaceholder" />
+        :placeholder="filterPlaceholder"
+        @checked-change="onSourceCheckedChange" />
     </div>
 
     <div class="el-transfer__buttons">
@@ -32,12 +33,14 @@
         v-bind="$props"
         :data="targetData"
         :title="titles[1] || '列表2'"
-        :placeholder="filterPlaceholder" />
+        :placeholder="filterPlaceholder"
+        @checked-change="onTargetCheckedChange" />
     </div>
   </div>
 </template>
 
 <script>
+import { list2Tree } from '@/assets/utils/tool'
 import ElTreeTransferPanel from './ElTreeTransferPanel'
 
 export default {
@@ -50,6 +53,20 @@ export default {
       type: Array,
       default () {
         return []
+      }
+    },
+    nodeKey: {
+      type: String,
+      default: 'id'
+    },
+    props: {
+      type: Object,
+      default () {
+        return {
+          label: 'label',
+          children: 'children',
+          disabled: 'disabled'
+        }
       }
     },
     titles: {
@@ -65,11 +82,11 @@ export default {
       }
     },
     filterable: Boolean,
-    filterMethod: Function,
     filterPlaceholder: {
       type: String,
       default: ''
-    }
+    },
+    filterMethod: Function
   },
   data () {
     return {
@@ -89,8 +106,26 @@ export default {
     }
   },
   methods: {
-    addToLeft () {},
-    addToRight () {}
+    onSourceCheckedChange (val) {
+      this.leftChecked = val
+    },
+    onTargetCheckedChange (val) {
+      this.rightChecked = val
+    },
+    addToLeft () {
+      // TODO list2Tree
+      // TODO 删除右侧tree节点
+      // TODO 数据合并至左侧tree
+      console.log('去左侧')
+      console.log(this.rightChecked)
+    },
+    addToRight () {
+      // TODO list2Tree
+      console.log(list2Tree(JSON.parse(JSON.stringify(this.leftChecked))))
+      // TODO 删除左侧tree节点
+      // TODO 数据合并至右侧tree
+      console.log('去右侧')
+    }
   }
 }
 </script>
