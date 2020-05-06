@@ -82,7 +82,7 @@ export default {
 
 <style scoped lang="scss">
 .el-container {
-  height: 100vh;
+  min-height: 100%;
   .el-aside {
     transition: width .3s;
   }

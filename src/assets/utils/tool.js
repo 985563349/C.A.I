@@ -66,3 +66,31 @@ export const list2Tree = (target, props = { id: 'id', parentId: 'parentId', chil
 }
 
 export const treeMerge = () => {}
+
+export const findComponentUpward = (context, componentName) => {
+  let parent = context?.$parent
+  let name = parent?.$options?.name
+
+  while (parent && (!name || name !== componentName)) {
+    parent = parent.$parent
+    name = parent?.$options?.name
+  }
+
+  return parent
+}
+
+export const findComponentMethodUpward = (context, methodName) => {
+  if (!context || !methodName) {
+    return
+  }
+
+  let parent = context?.$parent
+  let cb = parent?.[methodName]
+
+  while (parent && !cb) {
+    parent = parent.$parent
+    cb = parent?.[methodName]
+  }
+
+  return cb
+}

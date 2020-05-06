@@ -94,7 +94,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    min-height: 100%;
     background: #f3f3f3;
     &-content {
       display: flex;

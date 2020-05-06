@@ -1,56 +1,76 @@
 <template>
   <div :class="['el-easy-table', `el-easy-table--${size}`]">
-    <div class="table-search">
-      <el-form :size="size" :label-width="labelWidth">
-        <el-row :gutter="searchGutter">
-          <template v-for="search of filteredSearchs">
-            <el-col :span="search.span || columnSpan" :key="search.key">
-              <el-form-item :label="search.label">
-                <el-input v-if="search.type === 'input'" v-bind="search" />
+    <div class="el-easy-table-head">
+      <div class="el-easy-table-search">
+        <el-form :size="size" :label-width="labelWidth">
+          <el-row :gutter="searchGutter">
+            <template v-for="search of filteredSearchs">
+              <el-col :span="search.span || columnSpan" :key="search.key">
+                <el-form-item :label="search.label">
+                  <el-input v-if="search.type === 'input'" v-bind="search" v-model="searchParam[search.key]" />
 
-                <el-select v-if="search.type === 'select'" v-bind="search">
-                  <template v-for="option of search.options">
-                    <el-option :key="option.value" v-bind="option"/>
-                  </template>
-                </el-select>
+                  <el-select v-if="search.type === 'select'" v-bind="search" v-model="searchParam[search.key]">
+                    <template v-for="option of search.options">
+                      <el-option v-bind="option" :key="option.value" />
+                    </template>
+                  </el-select>
 
-                <el-date-picker v-if="search.type === 'date'" :type="search.controlType" v-bind="search" />
+                  <el-date-picker v-if="search.type === 'date'" v-bind="search" :type="search.controlType" />
+                </el-form-item>
+              </el-col>
+            </template>
+
+            <el-col :span="columnSpan">
+              <el-form-item>
+                <el-button type="primary" :size="size" @click="handleQuery">查询</el-button>
+                <el-button type="warning" :size="size" @click="resetSearchParam">重置</el-button>
+                <el-button
+                  :class="[
+                    'button-extension',
+                    { 'button-extension--active': searchExtension }
+                  ]"
+                  type="text"
+                  :size="size"
+                  @click="extensionHandle">
+                  <i class="el-icon-arrow-down" />
+                  {{ searchExtension ? '收起' : '展开' }}
+                </el-button>
               </el-form-item>
             </el-col>
-          </template>
+          </el-row>
+        </el-form>
+      </div>
 
-          <el-col :span="columnSpan">
-            <el-form-item>
-              <el-button type="primary" :size="size">查询</el-button>
-              <el-button type="warning" :size="size">重置</el-button>
-              <el-button :class="['button-extension', { 'button-extension--active': searchExtension }]" :size="size" type="text" @click="extensionHandle">
-                <i class="el-icon-arrow-down" />
-                {{ searchExtension ? '收起' : '展开' }}
+      <div class="el-easy-table-toolbar">
+        <div class="toolbar__title">{{ title }}</div>
+
+        <div class="toolbar-option">
+          <div class="toolbar-buttons">
+            <template v-for="button of toolButtons">
+              <el-button
+              v-bind="button"
+              :size="button.size || size"
+              :key="button.text"
+              @click="triggerCallback(button)">
+              {{ button.text }}
               </el-button>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-    </div>
+            </template>
+          </div>
+          <div class="toolbar-tools"></div>
+        </div>
+      </div>
 
-    <div class="table-toolbar">
-      <div class="table-toolbar-title">{{ title }}</div>
-
-      <div class="table-toolbar-option">
-        <el-button :size="size">添加</el-button>
+      <div class="el-easy-table-alert">
+        <el-alert
+          title="成功提示的文案"
+          type="success"
+          show-icon>
+        </el-alert>
       </div>
     </div>
 
-    <div class="table-alert">
-      <el-alert
-        title="成功提示的文案"
-        type="success"
-        show-icon>
-      </el-alert>
-    </div>
-
-    <div class="table-content">
-      <el-table :data="data" :size="size">
+    <div class="el-easy-table-body">
+      <el-table :data="data" :size="size" v-loading="loading">
         <el-table-column
           type="selection"
           align="center"
@@ -59,28 +79,56 @@
 
         <template v-for="column of columns">
           <el-table-column
-            :key="column.key"
+            v-if="!column.type || column.type === 'text'"
+            :key="column.title"
             :prop="column.key"
             :label="column.title"
             align="center">
           </el-table-column>
+
+          <el-table-column
+            v-if="column.type === 'operate'"
+            :key="column.title"
+            :prop="column.key"
+            :label="column.title"
+            align="center">
+            <template v-slot="{ row, $index }">
+              <template v-for="button of column.buttons">
+                <el-button
+                  v-bind="button"
+                  :size="button.size || size"
+                  :key="button.text"
+                  @click="triggerCallback(button, row, $index)">
+                  {{ button.text }}
+                </el-button>
+              </template>
+            </template>
+          </el-table-column>
         </template>
       </el-table>
 
-      <div class="table-footer">
-        <div>
-          <el-button :size="size">启用</el-button>
-          <el-button :size="size">禁用</el-button>
-          <el-button :size="size">删除</el-button>
+      <div class="el-easy-table-pagination">
+        <div class="el-east-table-buttons">
+          <template v-for="button of buttons">
+            <el-button
+              v-bind="button"
+              :size="button.size || size"
+              :key="button.text"
+              @click="triggerCallback(button, [])">
+              {{ button.text }}
+              </el-button>
+          </template>
         </div>
 
         <el-pagination
           :total="total"
-          :page-size="pageSize"
-          :current-page="currentPage"
+          :page-size="internalPageSize"
+          :current-page="internalCurrentPage"
           :page-sizes="pageSizes"
-          :layout="layout"
-          :background="paginationBackground">
+          :layout="paginationLayout"
+          :background="paginationBackground"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange">
         </el-pagination>
       </div>
     </div>
@@ -88,12 +136,15 @@
 </template>
 
 <script>
+import { findComponentMethodUpward, findComponentUpward } from '@/assets/utils/tool'
+
+const depClone = data => JSON.parse(JSON.stringify(data))
+
 export default {
   name: 'ElEasyTable',
   props: {
-    title: {
-      type: String,
-      default: '综合表格'
+    bindComponentName: {
+      type: String
     },
     total: {
       type: Number,
@@ -106,16 +157,6 @@ export default {
     currentPage: {
       type: Number,
       default: 1
-    },
-    pageSizes: {
-      type: Array,
-      default () {
-        return [100, 200, 300, 400]
-      }
-    },
-    layout: {
-      type: String,
-      default: 'total, sizes, prev, pager, next, jumper'
     },
     data: {
       type: Array,
@@ -131,6 +172,36 @@ export default {
         return []
       }
     },
+    buttons: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+    paginationLayout: {
+      type: String,
+      default: 'total, sizes, prev, pager, next, jumper'
+    },
+    pageSizes: {
+      type: Array,
+      default () {
+        return [10, 20, 50, 100]
+      }
+    },
+    title: {
+      type: String,
+      default: '综合表格'
+    },
+    size: {
+      type: String,
+      validator (val) {
+        return ['medium', 'small', 'mini'].includes(val)
+      }
+    },
+    labelWidth: {
+      type: String,
+      default: '80px'
+    },
     searchSplit: {
       type: Number,
       default: 3,
@@ -142,24 +213,30 @@ export default {
       type: Number,
       default: 10
     },
-    labelWidth: {
-      type: String,
-      default: '80px'
-    },
-    size: {
-      type: String,
-      validator (val) {
-        return ['medium', 'small', 'mini'].includes(val)
+    toolButtons: {
+      type: Array,
+      default () {
+        return []
       }
-    }
+    },
+    loading: Boolean
   },
   data () {
+    this.bindComponent = null
+    this.pageSizeSnap = -1
+    this.currentPageSnap = -1
+    this.searchParamSnap = null
+
     return {
+      internalPageSize: 10,
+      internalCurrentPage: 1,
+      searchParam: {},
       searchExtension: false
     }
   },
   computed: {
     filteredSearchs () {
+      // TODO 截取数修改为动态配置
       const end = this.searchExtension ? this.searchs.length : 4
       return this.searchs.slice(0, end)
     },
@@ -171,9 +248,89 @@ export default {
       return this.size !== 'mini'
     }
   },
+  created () {
+    this.defineSearchParam()
+    this.syncProps()
+    this.notifyRequest()
+    this.createPropSnap()
+    this.findBindComponent()
+  },
   methods: {
+    defineSearchParam () {
+      this.searchParam = this.searchs.reduce((prev, item) => {
+        prev[item.key] = item.value ?? ''
+        return prev
+      }, {})
+    },
+    syncProps () {
+      const { pageSize, currentPage } = this
+      this.internalPageSize = pageSize
+      this.internalCurrentPage = currentPage
+    },
+    createPropSnap () {
+      // 生成初始参数快照
+      const { searchParam, pageSize, currentPage } = this
+      this.searchParamSnap = depClone(searchParam)
+      this.pageSizeSnap = pageSize
+      this.currentPageSnap = currentPage
+    },
+    notifyRequest () {
+      const param = depClone(this.searchParam)
+      param.pageSize = this.internalPageSize
+      param.currentPage = this.internalCurrentPage
+
+      this.$emit('request-trigger', param)
+    },
+    handleSizeChange (val) {
+      this.$emit('update:pageSize', val)
+      this.internalPageSize = val
+      // 刷新Table
+      this.refreshTable()
+    },
+    handleCurrentChange (val) {
+      this.$emit('update:currentPage', val)
+      this.internalCurrentPage = val
+      // 刷新Table
+      this.refreshTable()
+    },
+    triggerCallback (option, data, index) {
+      const bindComponent = this.bindComponent
+      const cb = bindComponent ? bindComponent[option.handle] : findComponentMethodUpward(this, option.handle)
+
+      if (data) {
+        data = depClone(data)
+      }
+
+      cb && cb(option, data, index)
+    },
     extensionHandle () {
       this.searchExtension = !this.searchExtension
+    },
+    handleQuery () {
+      this.refreshTable({ pageSize: 1 })
+    },
+    resetSearchParam () {
+      Object.assign(this.searchParam, this.searchParamSnap)
+    },
+    findBindComponent () {
+      const componentName = this.bindComponentName
+      if (componentName) {
+        this.bindComponent = findComponentUpward(this, componentName)
+      }
+    },
+    /** *
+     * refreshTable 刷新table，可供外部调用
+     */
+    refreshTable (...args) {
+      if (args[0] === true || args[1] === true) {
+        // TODO 重置参数
+      }
+
+      if (typeof args[0] === 'object') {
+        // 合并参数
+      }
+
+      this.notifyRequest()
     }
   }
 }
@@ -183,63 +340,39 @@ export default {
   .el-easy-table {
     display: flex;
     flex-direction: column;
-    min-height: 100%;
+    width: 100%;
     background-color: #fff;
-    .table {
-      &-search {
-        .el-select, .el-date-editor {
-          width: 100%;
+    &-head {
+      margin-bottom: 18px;
+    }
+    &-search {
+      .el-select, .el-date-editor {
+        width: 100%;
+      }
+      .button-extension {
+        i {
+          transition: .3s;
         }
-        .button-extension {
+        &--active {
           i {
-            transition: .3s;
-          }
-          &--active {
-            i {
-              transform: rotate(180deg);
-            }
-          }
-        }
-      }
-      &-toolbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      &-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
-      &-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-    }
-    &--medium {
-      .table {
-        &-toolbar, &-alert {
-          margin-bottom: 22px;
-        }
-        &-content {
-          .el-table {
-            margin-bottom: 22px;
+            transform: rotate(180deg);
           }
         }
       }
     }
-    &--small, &--mini {
-      .table {
-        &-toolbar, &-alert {
-          margin-bottom: 18px;
-        }
-        &-content {
-          .el-table {
-            margin-bottom: 18px;
-          }
-        }
-      }
+    &-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .el-table {
+      margin-bottom: 18px;
+    }
+    &-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
   }
 </style>
