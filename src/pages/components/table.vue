@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { getTableList } from '@/api/modules/component'
+
 export default {
   name: 'Table',
   data () {
@@ -21,16 +23,13 @@ export default {
         total: 1000,
         pageSize: 10,
         currentPage: 1,
-        data: [
-          { name: '王花花', gender: 1, age: '22' },
-          { name: '李栓蛋', gender: 1, age: '21' },
-          { name: '李栓蛋', gender: 1, age: '21' },
-          { name: '李栓蛋', gender: 1, age: '21' }
-        ],
+        data: [],
         columns: [
           { title: '姓名', key: 'name' },
           { title: '性别', key: 'gender' },
           { title: '年龄', key: 'age' },
+          { title: '地址', key: 'address' },
+          { title: '注册时间', key: 'date' },
           {
             title: '操作',
             type: 'operate',
@@ -41,13 +40,11 @@ export default {
           }
         ],
         searchs: [
-          { type: 'input', label: '姓名：', key: 'name0', placeholder: '请输入姓名' },
-          { type: 'input', label: '姓名：', key: 'name1', placeholder: '请输入姓名' },
-          { type: 'input', label: '姓名：', key: 'name2', placeholder: '请输入姓名' },
-          { type: 'input', label: '姓名：', key: 'name3', placeholder: '请输入姓名' },
-          { type: 'input', label: '姓名：', key: 'name4', placeholder: '请输入姓名' },
+          { type: 'input', label: '姓名：', key: 'name', placeholder: '请输入姓名' },
+          { type: 'input', label: '年龄：', key: 'age', placeholder: '请输入年龄' },
+          { type: 'input', label: '地址：', key: 'address', placeholder: '请输入地址' },
           { type: 'select', label: '性别：', key: 'gander', placeholder: '请选择性别', options: [{ label: '男', value: 1 }, { label: '女', value: 0 }] },
-          { type: 'date', controlType: 'datetimerange', label: '时间范围：', key: 'data', startPlaceholder: '开始日期', endPlaceholder: '结束日期' }
+          { type: 'date', controlType: 'datetimerange', label: '注册时间：', key: 'data', startPlaceholder: '开始日期', endPlaceholder: '结束日期' }
         ],
         buttons: [
           { text: '启用', handle: 'changeStatus' },
@@ -67,12 +64,15 @@ export default {
     }
   },
   methods: {
-    getTableData (param) {
+    async getTableData (param) {
       this.tableOptions.loading = true
-      console.log(param)
-      setTimeout(() => {
+      try {
+        this.tableOptions.data = await getTableList()
+      } catch (e) {
+        console.log(e)
+      } finally {
         this.tableOptions.loading = false
-      }, 2000)
+      }
     },
     userOperate (option, data, index) {
       console.log(option, data, index)

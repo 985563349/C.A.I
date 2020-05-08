@@ -2,13 +2,15 @@ import Mock from 'mockjs'
 import qs from 'qs'
 
 import user from './user'
+import component from './component'
 
 Mock.setup({
   timeout: 300
 })
 
 const mocks = [
-  ...user
+  ...user,
+  ...component
 ]
 
 export function mockXHR () {
