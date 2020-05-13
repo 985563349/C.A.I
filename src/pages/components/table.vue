@@ -2,6 +2,7 @@
   <div class="page-table">
     <div class="el-card is-always-shadow">
       <el-easy-table
+        ref="table"
         v-bind="tableOptions"
         :pageSize.sync="tableOptions.pageSize"
         :currentPage.sync="tableOptions.currentPage"
@@ -28,13 +29,14 @@ export default {
           { title: '姓名', key: 'name' },
           { title: '性别', key: 'gender' },
           { title: '年龄', key: 'age' },
+          { type: 'image', title: '头像', key: 'avatar', alt: '头像', style: { width: '50px', height: '50px', verticalAlign: 'middle' } },
           { title: '地址', key: 'address' },
           { title: '注册时间', key: 'date' },
           {
             title: '操作',
             type: 'operate',
             buttons: [
-              { text: '编辑', handle: 'userOperate' },
+              { text: '编辑', handle: 'userOperate', param: { type: 'edit' } },
               { text: '删除' }
             ]
           }
@@ -52,9 +54,7 @@ export default {
           { text: '删除' }
         ],
         toolButtons: [
-          { text: '启用', handle: 'changeStatus' },
-          { text: '禁用' },
-          { text: '删除' }
+          { text: '添加用户', handle: 'userOperate', param: { type: 'add' } }
         ],
         searchSplit: 3,
         labelWidth: '100px',
@@ -65,6 +65,7 @@ export default {
   },
   methods: {
     async getTableData (param) {
+      console.log(param)
       this.tableOptions.loading = true
       try {
         this.tableOptions.data = await getTableList()
@@ -75,7 +76,8 @@ export default {
       }
     },
     userOperate (option, data, index) {
-      console.log(option, data, index)
+      const { type } = option.param
+      this.$refs.table.refreshTable(null, type === 'add')
     }
   }
 }

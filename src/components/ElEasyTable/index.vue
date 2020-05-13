@@ -20,10 +20,10 @@
               </el-col>
             </template>
 
-            <el-col :span="columnSpan">
+            <el-col v-if="searchMode !== 'immediate'" :span="columnSpan">
               <el-form-item>
-                <el-button type="primary" :size="size" @click="handleQuery">查询</el-button>
-                <el-button type="warning" :size="size" @click="resetSearchParam">重置</el-button>
+                <el-button type="primary" :size="size" @click="refreshTable({ currentPage: 1 })">查询</el-button>
+                <el-button type="warning" :size="size" @click="updateSearchParam(searchParamSnap)">重置</el-button>
                 <el-button
                   :class="[
                     'button-extension',
@@ -31,7 +31,7 @@
                   ]"
                   type="text"
                   :size="size"
-                  @click="extensionHandle">
+                  @click="searchExtension = !searchExtension">
                   <i class="el-icon-arrow-down" />
                   {{ searchExtension ? '收起' : '展开' }}
                 </el-button>
@@ -87,6 +87,20 @@
           </el-table-column>
 
           <el-table-column
+            v-if="column.type === 'image'"
+            :key="column.title"
+            :prop="column.key"
+            :label="column.title"
+            align="center">
+            <template v-slot="{ row }">
+              <img
+                :src="row[column.key]"
+                :style="column.style"
+                :alt="column.alt">
+            </template>
+          </el-table-column>
+
+          <el-table-column
             v-if="column.type === 'operate'"
             :key="column.title"
             :prop="column.key"
@@ -136,7 +150,12 @@
 </template>
 
 <script>
-import { findComponentMethodUpward, findComponentUpward } from '@/assets/utils/tool'
+import {
+  isObject,
+  findComponentMethodUpward,
+  findComponentUpward,
+  debounce
+} from '@/assets/utils/tool'
 
 const depClone = data => JSON.parse(JSON.stringify(data))
 
@@ -213,6 +232,10 @@ export default {
       type: Number,
       default: 10
     },
+    searchMode: {
+      type: String,
+      default: 'click'
+    },
     toolButtons: {
       type: Array,
       default () {
@@ -250,30 +273,102 @@ export default {
   },
   created () {
     this.defineSearchParam()
-    this.syncProps()
+    this.syncProp()
     this.notifyRequest()
     this.createPropSnap()
     this.findBindComponent()
+
+    // 即时搜索监听searchParam
+    if (this.searchMode === 'immediate') {
+      this.defineWatch('searchParam', this.refreshTable, { deep: true }, 1000)
+    }
   },
   methods: {
+    /** *
+     * defineSearchParam 定义searchParam
+     */
     defineSearchParam () {
       this.searchParam = this.searchs.reduce((prev, item) => {
         prev[item.key] = item.value ?? ''
         return prev
       }, {})
     },
-    syncProps () {
+    /** *
+     * syncProp 同步prop数据
+     */
+    syncProp () {
       const { pageSize, currentPage } = this
       this.internalPageSize = pageSize
       this.internalCurrentPage = currentPage
     },
+    /** *
+     * createPropSnap 创建prop快照
+     */
     createPropSnap () {
-      // 生成初始参数快照
       const { searchParam, pageSize, currentPage } = this
       this.searchParamSnap = depClone(searchParam)
       this.pageSizeSnap = pageSize
       this.currentPageSnap = currentPage
     },
+    /** * 定义数据观察 defineWatch
+     * @param {Stirng|Function} expOrFn 监听字段
+     */
+    defineWatch (expOrFn, cb, option, wait) {
+      this.$watch(expOrFn, debounce(cb, wait), option)
+    },
+    /** *
+     * updatePageSize 更新pageSize
+     * @param {Number} pageSize
+     */
+    updatePageSize (pageSize) {
+      if (pageSize > 0) {
+        this.internalPageSize = pageSize
+        this.$emit('update:pageSize', pageSize)
+      }
+    },
+    /** *
+     * updateCurrentPage 更新currentPage
+     * @param {Number} currentPage
+     */
+    updateCurrentPage (currentPage) {
+      if (currentPage > 0) {
+        this.internalCurrentPage = currentPage
+        this.$emit('update:currentPage', currentPage)
+      }
+    },
+    /** *
+     * handleSizeChange 处理pageSize变化
+     * @param {Number} val 当前pageSize
+     */
+    handleSizeChange (val) {
+      this.updatePageSize(val)
+      this.refreshTable()
+    },
+    /** *
+     * handleCurrentChange 处理currentPage变化
+     * @param {Number} val 当前currentPage
+     */
+    handleCurrentChange (val) {
+      this.updateCurrentPage(val)
+      this.refreshTable()
+    },
+    /** *
+     * updateSearchParam 重置searchs查询参数
+     * @param {Object} searchParam 更新查询字段
+     */
+    updateSearchParam (searchParam) {
+      Object.assign(this.searchParam, searchParam)
+    },
+    /** *
+     * findBindComponent 查找绑定组件
+     */
+    findBindComponent () {
+      const componentName = this.bindComponentName
+      if (componentName) { this.bindComponent = findComponentUpward(this, componentName) }
+    },
+    /** *
+     * notifyRequest 通知请求
+     */
     notifyRequest () {
       const param = depClone(this.searchParam)
       param.pageSize = this.internalPageSize
@@ -281,54 +376,32 @@ export default {
 
       this.$emit('request-trigger', param)
     },
-    handleSizeChange (val) {
-      this.$emit('update:pageSize', val)
-      this.internalPageSize = val
-      // 刷新Table
-      this.refreshTable()
-    },
-    handleCurrentChange (val) {
-      this.$emit('update:currentPage', val)
-      this.internalCurrentPage = val
-      // 刷新Table
-      this.refreshTable()
-    },
+    /** *
+     * triggerCallback 事件触发器
+     * @param {Object} option 按钮配置项
+     * @param {Object|Array} data 列表数据
+     * @param {Number|Undefined} index 当前操作数据索引
+     */
     triggerCallback (option, data, index) {
-      const bindComponent = this.bindComponent
-      const cb = bindComponent ? bindComponent[option.handle] : findComponentMethodUpward(this, option.handle)
-
-      if (data) {
-        data = depClone(data)
-      }
-
-      cb && cb(option, data, index)
-    },
-    extensionHandle () {
-      this.searchExtension = !this.searchExtension
-    },
-    handleQuery () {
-      this.refreshTable({ pageSize: 1 })
-    },
-    resetSearchParam () {
-      Object.assign(this.searchParam, this.searchParamSnap)
-    },
-    findBindComponent () {
-      const componentName = this.bindComponentName
-      if (componentName) {
-        this.bindComponent = findComponentUpward(this, componentName)
-      }
+      const cb = this.bindComponent?.[option.handle] ?? findComponentMethodUpward(this, option.handle)
+      if (!cb) { return }
+      cb(option, data ? depClone(data) : data, index)
     },
     /** *
      * refreshTable 刷新table，可供外部调用
+     * @param {Object} param 合并参数
+     * @param {Boolean} isReset 是否重置参数
      */
-    refreshTable (...args) {
-      if (args[0] === true || args[1] === true) {
-        // TODO 重置参数
-      }
+    refreshTable (param, isReset) {
+      param = isObject(param) ? param : {}
+      let { pageSize, currentPage, ...searchParam } = param
+      searchParam = isReset ? { ...this.searchParamSnap, searchParam } : searchParam
+      pageSize = pageSize || (isReset ? this.pageSizeSnap : undefined)
+      currentPage = currentPage || (isReset ? this.currentPageSnap : undefined)
 
-      if (typeof args[0] === 'object') {
-        // 合并参数
-      }
+      this.updateSearchParam(searchParam)
+      this.updatePageSize(pageSize)
+      this.updateCurrentPage(currentPage)
 
       this.notifyRequest()
     }

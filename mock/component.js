@@ -9,6 +9,7 @@ export default [
           id: '@guid',
           name: '@cname',
           age: '@integer(20, 80)',
+          avatar: '@image(100x100)',
           gender: '@integer(0, 1)',
           date: '@date(yyyy-MM-dd HH:mm:ss)',
           address: '@city(true)'

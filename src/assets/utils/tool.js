@@ -94,3 +94,29 @@ export const findComponentMethodUpward = (context, methodName) => {
 
   return cb
 }
+
+export const throttle = (cb, wait) => {
+  let time = 0
+  return function () {
+    const now = Date.now()
+    if (now - time >= wait) {
+      cb.apply(this, arguments)
+      time = now
+    }
+  }
+}
+
+export const debounce = (cb, wait) => {
+  let timer = null
+  return function () {
+    if (timer) {
+      clearTimeout(timer)
+      timer = null
+    }
+    timer = setTimeout(() => {
+      cb.apply(this, arguments)
+    }, wait)
+  }
+}
+
+export const isObject = data => typeof data === 'object' && data !== null
