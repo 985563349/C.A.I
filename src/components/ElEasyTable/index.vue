@@ -165,10 +165,7 @@ export default {
     bindComponentName: {
       type: String
     },
-    total: {
-      type: Number,
-      default: 0
-    },
+    total: Number,
     pageSize: {
       type: Number,
       default: 10
@@ -185,42 +182,27 @@ export default {
       type: Array,
       required: true
     },
-    searchs: {
-      type: Array,
-      default () {
-        return []
-      }
-    },
     buttons: {
       type: Array,
       default () {
         return []
       }
     },
-    paginationLayout: {
-      type: String,
-      default: 'total, sizes, prev, pager, next, jumper'
-    },
-    pageSizes: {
+    searchs: {
       type: Array,
       default () {
-        return [10, 20, 50, 100]
+        return []
       }
     },
-    title: {
+    searchMode: {
       type: String,
-      default: '综合表格'
+      default: 'click'
     },
-    size: {
-      type: String,
-      validator (val) {
-        return ['medium', 'small', 'mini'].includes(val)
-      }
+    searchWait: {
+      type: Number,
+      default: 300
     },
-    labelWidth: {
-      type: String,
-      default: '80px'
-    },
+    searchMax: Number,
     searchSplit: {
       type: Number,
       default: 3,
@@ -232,15 +214,37 @@ export default {
       type: Number,
       default: 10
     },
-    searchMode: {
+    labelWidth: {
       type: String,
-      default: 'click'
+      default: '80px'
+    },
+    paginationLayout: {
+      type: String,
+      default: 'total, sizes, prev, pager, next, jumper'
+    },
+    pageSizes: {
+      type: Array,
+      default () {
+        return [10, 20, 50, 100]
+      }
+    },
+    toolBoxLayout: {
+      type: String,
+      default: ''
     },
     toolButtons: {
       type: Array,
       default () {
         return []
       }
+    },
+    title: String,
+    size: {
+      type: String,
+      validator (val) {
+        return ['medium', 'small', 'mini'].includes(val)
+      },
+      default: 'medium'
     },
     loading: Boolean
   },
