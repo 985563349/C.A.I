@@ -11,13 +11,14 @@
 - [x] 批量操作按钮配置
 - [x] 行操作按钮配置
 - [x] 分页配置
-- [ ] 数据单选
-- [ ] 数据多选
+- [x] 数据单选
+- [x] 数据多选
 - [x] loading
 - [x] 事件绑定
-- [ ] 分页勾选记忆
+- [x] 分页勾选记忆
 - [ ] 分页删除数据处理
 - [x] 按钮显隐控制
+- [x] 树形表格
 
 
 
@@ -27,33 +28,37 @@
 
 表格配置
 
-|        参数         |                        说明                        |         类型         |                 可选值                  |                 默认值                  |
-| :-----------------: | :------------------------------------------------: | :------------------: | :-------------------------------------: | :-------------------------------------: |
-| bind-component-name |     绑定组件名，table内部会向上递归找到此组件      |        string        |                    —                    |                    —                    |
-|       row-key       | 每个数据项用来作为唯一标识的属性，每项应该是唯一的 |        string        |                    —                    |                    —                    |
-|        total        |                      条目总数                      |        number        |                    —                    |                    —                    |
-|      page-size      |          每页显示条目个数，支持sync修饰符          |        number        |                    —                    |                   10                    |
-|    current-page     |              当前页数，支持sync修饰符              |        number        |                    —                    |                    1                    |
-|        data         |                      显示数据                      |        array         |                    —                    |                    —                    |
-|       columns       |              表格列配置项，具体看下表              |       object[]       |                    —                    |                    —                    |
-|       buttons       |           批量操作按钮配置项，具体看下表           |       object[]       |                    —                    |                    —                    |
-|       searchs       |             筛选控件配置项，具体看下表             |       object[]       |                    —                    |                    —                    |
-|     search-mode     |            搜索模式，点击搜索或即时搜索            |        number        |             click/immediate             |                  click                  |
-|     search-wait     |               即时搜索，去抖延迟时间               |        number        |                    —                    |                   300                   |
-|     search-max      |        筛选控件最大显示数，超出部分将被收起        |        number        |                    —                    |                    —                    |
-|    search-split     |         筛选控件每行显示个数，仅支持1~4个          |        number        |                    —                    |                    3                    |
-|    search-gutter    |                    筛选控件间隔                    |        number        |                    —                    |                   10                    |
-|     label-width     |                 筛选控件lable宽度                  |        number        |                    —                    |                   80                    |
-|  pagination-layout  |          分页组件布局，子组件名用逗号分隔          |        string        | total, sizes, prev, pager, next, jumper | total, sizes, prev, pager, next, jumper |
-|     page-sizes      |           每页显示个数选择器的下拉框类名           |       number[]       |                    —                    |        [10, 20, 30, 40, 50, 100]        |
-|   toolbox-layout    |            工具栏布局，子组件用逗号分隔            |        string        |                                         |                                         |
-|    tool-buttons     |             工具栏按钮配置，具体看下表             |       object[]       |                    —                    |                    —                    |
-|      selection      |                                                    |                      |                                         |                                         |
-|     selectable      |    返回值用来决定这一行的 CheckBox 是否可以勾选    | function(row, index) |                    —                    |                    —                    |
-|  reserve-selection  | 数据更新之后保留之前选中的数据（需指定 `row-key`） |       boolean        |                    —                    |                  false                  |
-|        title        |                      表格标题                      |        string        |                    —                    |                    —                    |
-|        size         |         表格大小（包括筛选控件、操作按钮）         |        string        |            medium/small/mini            |                    —                    |
-|       loading       |                    表格loading                     |       boolean        |               true/false                |                  false                  |
+|        参数         |                             说明                             |         类型         |                 可选值                  |                 默认值                  |
+| :-----------------: | :----------------------------------------------------------: | :------------------: | :-------------------------------------: | :-------------------------------------: |
+| bind-component-name |          绑定组件名，table内部会向上递归找到此组件           |        string        |                    —                    |                    —                    |
+|       row-key       |      每个数据项用来作为唯一标识的属性，每项应该是唯一的      |        string        |                    —                    |                    —                    |
+|        total        |                           条目总数                           |        number        |                    —                    |                    —                    |
+|      page-size      |               每页显示条目个数，支持sync修饰符               |        number        |                    —                    |                   10                    |
+|    current-page     |                   当前页数，支持sync修饰符                   |        number        |                    —                    |                    1                    |
+|        data         |                           显示数据                           |        array         |                    —                    |                    —                    |
+|       columns       |                   表格列配置项，具体看下表                   |       object[]       |                    —                    |                    —                    |
+|       buttons       |                批量操作按钮配置项，具体看下表                |       object[]       |                    —                    |                    —                    |
+|       searchs       |                  筛选控件配置项，具体看下表                  |       object[]       |                    —                    |                    —                    |
+|     search-mode     |                 搜索模式，点击搜索或即时搜索                 |        number        |             click/immediate             |                  click                  |
+|     search-wait     |                    即时搜索，去抖延迟时间                    |        number        |                    —                    |                   300                   |
+|     search-max      |             筛选控件最大显示数，超出部分将被收起             |        number        |                    —                    |                    —                    |
+|    search-split     |              筛选控件每行显示个数，仅支持1~4个               |        number        |                    —                    |                    3                    |
+|    search-gutter    |                         筛选控件间隔                         |        number        |                    —                    |                   10                    |
+|     label-width     |                      筛选控件lable宽度                       |        number        |                    —                    |                   80                    |
+|  pagination-layout  |               分页组件布局，子组件名用逗号分隔               |        string        | total, sizes, prev, pager, next, jumper | total, sizes, prev, pager, next, jumper |
+|     page-sizes      |                每页显示个数选择器的下拉框类名                |       number[]       |                    —                    |        [10, 20, 30, 40, 50, 100]        |
+|   toolbox-layout    |                 工具栏布局，子组件用逗号分隔                 |        string        |                                         |                                         |
+|    tool-buttons     |                  工具栏按钮配置，具体看下表                  |       object[]       |                    —                    |                    —                    |
+|        check        |                         选择多行数据                         |       boolean        |                    —                    |                  false                  |
+|        radio        |                         选择单行数据                         |       boolean        |                    —                    |                  false                  |
+|  defaultExpandAll   | 是否默认展开所有行，当 Table 包含展开行存在或者为树形表格时有效 |       boolean        |                    —                    |                  false                  |
+|     selectable      |         返回值用来决定这一行的 CheckBox 是否可以勾选         | function(row, index) |                    —                    |                    —                    |
+|  reserve-selection  |      数据更新之后保留之前选中的数据（需指定 `row-key`）      |       boolean        |                    —                    |                  false                  |
+|        title        |                           表格标题                           |        string        |                    —                    |                    —                    |
+|        size         |              表格大小（包括筛选控件、操作按钮）              |        string        |            medium/small/mini            |                    —                    |
+|       loading       |                         表格loading                          |       boolean        |               true/false                |                  false                  |
+
+
 
 
 

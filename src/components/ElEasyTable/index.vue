@@ -30,7 +30,7 @@
               </el-col>
             </template>
 
-            <el-col :span="columnSpan">
+            <el-col v-if="filteredSearchs.length" :span="columnSpan">
               <el-form-item>
                 <el-button type="primary" :size="size" @click="refreshTable({ currentPage: 1 })">查询</el-button>
                 <el-button type="warning" :size="size" @click="updateSearchParam(searchParamSnap)">重置</el-button>
@@ -83,7 +83,10 @@
         v-loading="loading"
         :data="data"
         :size="size"
+        :row-key="rowKey"
+        :default-expand-all="defaultExpandAll"
         @selection-change="handleSelectionChange">
+        <!-- 多选框 -->
         <el-table-column
           v-if="check"
           :selectable="selectable"
@@ -92,6 +95,7 @@
           width="55"
           align="center" />
 
+        <!-- 单选框 -->
         <el-table-column
           v-else-if="radio"
           width="55"
@@ -262,6 +266,7 @@ export default {
     },
     check: Boolean,
     radio: Boolean,
+    defaultExpandAll: Boolean,
     selectable: Function,
     reserveSelection: Boolean,
     title: String,
@@ -398,9 +403,10 @@ export default {
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: 100%;
     background-color: #fff;
     &-head {
-      margin-bottom: 18px;
+      padding-bottom: 18px;
     }
     &-search {
       .el-select, .el-date-editor {
@@ -427,10 +433,21 @@ export default {
         align-items: center;
       }
     }
+    &-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
     .el-table {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       margin-bottom: 18px;
       /deep/ .el-radio__label {
         padding-left: 0;
+      }
+      /deep/ .is-scrolling-none {
+        flex: 1;
       }
     }
     &-pagination {
