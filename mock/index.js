@@ -13,9 +13,9 @@ const mocks = [
   ...component
 ]
 
-export function mockXHR () {
-  function XHR2ExpressReqWrap (respond) {
-    return function (options) {
+export const mockXHR = () => {
+  const XHR2ExpressReqWrap = respond => {
+    return options => {
       const { url, type, body } = options
       let result
 

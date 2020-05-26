@@ -7,6 +7,13 @@
         :pageSize.sync="tableOptions.pageSize"
         :currentPage.sync="tableOptions.currentPage"
         @request-trigger="getTableData">
+          <template #alert>
+            <el-alert
+              title="成功提示的文案"
+              type="success"
+              show-icon>
+            </el-alert>
+          </template>
         </el-easy-table>
     </div>
   </div>
@@ -35,6 +42,7 @@ export default {
           {
             title: '操作',
             type: 'operate',
+            buttonMax: 8,
             buttons: [
               { text: '编辑', handle: 'userOperate', param: { type: 'edit' } },
               { text: '删除' }
@@ -42,7 +50,7 @@ export default {
           }
         ],
         searchs: [
-          { type: 'input', label: '姓名：', key: 'name', placeholder: '请输入姓名' },
+          { type: 'input', label: '姓名：', key: 'name', placeholder: '请输入姓名', clearable: true },
           { type: 'input', label: '年龄：', key: 'age', placeholder: '请输入年龄' },
           { type: 'input', label: '地址：', key: 'address', placeholder: '请输入地址' },
           { type: 'select', label: '性别：', key: 'gander', placeholder: '请选择性别', options: [{ label: '男', value: 1 }, { label: '女', value: 0 }] },
@@ -56,10 +64,14 @@ export default {
         toolButtons: [
           { text: '添加用户', handle: 'userOperate', param: { type: 'add' } }
         ],
+        title: '表格',
+        searchMax: 4,
         searchSplit: 3,
-        labelWidth: '100px',
+        labelWidth: 100,
         size: 'small',
-        loading: false
+        loading: false,
+        rowKey: 'id',
+        radio: true
       }
     }
   },

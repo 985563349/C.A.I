@@ -2,25 +2,35 @@
   <div :class="['el-easy-table', `el-easy-table--${size}`]">
     <div class="el-easy-table-head">
       <div class="el-easy-table-search">
-        <el-form :size="size" :label-width="labelWidth">
+        <el-form :size="size" :label-width="`${labelWidth}px`">
           <el-row :gutter="searchGutter">
             <template v-for="search of filteredSearchs">
               <el-col :span="search.span || columnSpan" :key="search.key">
                 <el-form-item :label="search.label">
-                  <el-input v-if="search.type === 'input'" v-bind="search" v-model="searchParam[search.key]" />
+                  <el-input
+                    v-if="search.type === 'input'"
+                    v-model="searchParam[search.key]"
+                    v-bind="search" />
 
-                  <el-select v-if="search.type === 'select'" v-bind="search" v-model="searchParam[search.key]">
+                  <el-select
+                    v-if="search.type === 'select'"
+                    v-model="searchParam[search.key]"
+                    v-bind="search">
                     <template v-for="option of search.options">
                       <el-option v-bind="option" :key="option.value" />
                     </template>
                   </el-select>
 
-                  <el-date-picker v-if="search.type === 'date'" v-bind="search" :type="search.controlType" />
+                  <el-date-picker
+                    v-if="search.type === 'date'"
+                    v-model="searchParam[search.key]"
+                    v-bind="search"
+                    :type="search.controlType" />
                 </el-form-item>
               </el-col>
             </template>
 
-            <el-col v-if="searchMode !== 'immediate'" :span="columnSpan">
+            <el-col :span="columnSpan">
               <el-form-item>
                 <el-button type="primary" :size="size" @click="refreshTable({ currentPage: 1 })">查询</el-button>
                 <el-button type="warning" :size="size" @click="updateSearchParam(searchParamSnap)">重置</el-button>
@@ -48,33 +58,47 @@
           <div class="toolbar-buttons">
             <template v-for="button of toolButtons">
               <el-button
-              v-bind="button"
-              :size="button.size || size"
-              :key="button.text"
-              @click="triggerCallback(button)">
-              {{ button.text }}
+                v-bind="button"
+                :size="button.size || size"
+                :key="button.text"
+                @click="triggerCallback(button)">
+                {{ button.text }}
               </el-button>
             </template>
           </div>
-          <div class="toolbar-tools"></div>
+
+          <div class="toolbar-tools">
+            <Fullscreen />
+          </div>
         </div>
       </div>
 
       <div class="el-easy-table-alert">
-        <el-alert
-          title="成功提示的文案"
-          type="success"
-          show-icon>
-        </el-alert>
+        <slot name="alert"></slot>
       </div>
     </div>
 
     <div class="el-easy-table-body">
-      <el-table :data="data" :size="size" v-loading="loading">
+      <el-table
+        v-loading="loading"
+        :data="data"
+        :size="size"
+        @selection-change="handleSelectionChange">
         <el-table-column
+          v-if="check"
+          :selectable="selectable"
+          :reserve-selection="reserveSelection"
           type="selection"
-          align="center"
-          width="55">
+          width="55"
+          align="center" />
+
+        <el-table-column
+          v-else-if="radio"
+          width="55"
+          align="center">
+          <template v-slot="{ row }">
+            <el-radio v-model="singleSelection" :label="row"><span/></el-radio>
+          </template>
         </el-table-column>
 
         <template v-for="column of columns">
@@ -83,8 +107,7 @@
             :key="column.title"
             :prop="column.key"
             :label="column.title"
-            align="center">
-          </el-table-column>
+            align="center" />
 
           <el-table-column
             v-if="column.type === 'image'"
@@ -126,6 +149,7 @@
           <template v-for="button of buttons">
             <el-button
               v-bind="button"
+              :disabled="!multipleSelection.length"
               :size="button.size || size"
               :key="button.text"
               @click="triggerCallback(button, [])">
@@ -153,8 +177,7 @@
 import {
   isObject,
   findComponentMethodUpward,
-  findComponentUpward,
-  debounce
+  findComponentUpward
 } from '@/assets/utils/tool'
 
 const depClone = data => JSON.parse(JSON.stringify(data))
@@ -162,9 +185,8 @@ const depClone = data => JSON.parse(JSON.stringify(data))
 export default {
   name: 'ElEasyTable',
   props: {
-    bindComponentName: {
-      type: String
-    },
+    bindComponentName: String,
+    rowKey: String,
     total: Number,
     pageSize: {
       type: Number,
@@ -215,8 +237,8 @@ export default {
       default: 10
     },
     labelWidth: {
-      type: String,
-      default: '80px'
+      type: Number,
+      default: 80
     },
     paginationLayout: {
       type: String,
@@ -238,6 +260,10 @@ export default {
         return []
       }
     },
+    check: Boolean,
+    radio: Boolean,
+    selectable: Function,
+    reserveSelection: Boolean,
     title: String,
     size: {
       type: String,
@@ -258,18 +284,27 @@ export default {
       internalPageSize: 10,
       internalCurrentPage: 1,
       searchParam: {},
-      searchExtension: false
+      searchExtension: false,
+      multipleSelection: []
     }
   },
   computed: {
     filteredSearchs () {
-      // TODO 截取数修改为动态配置
-      const end = this.searchExtension ? this.searchs.length : 4
+      const length = this.searchs.length
+      const end = this.searchExtension ? length : this.searchMax
       return this.searchs.slice(0, end)
     },
     columnSpan () {
       const col = Math.min(this.searchSplit, 4)
       return 24 / col
+    },
+    singleSelection: {
+      get () {
+        return this.multipleSelection[0]
+      },
+      set (val) {
+        this.multipleSelection.splice(0, 1, val)
+      }
     },
     paginationBackground () {
       return this.size !== 'mini'
@@ -281,98 +316,51 @@ export default {
     this.notifyRequest()
     this.createPropSnap()
     this.findBindComponent()
-
-    // 即时搜索监听searchParam
-    if (this.searchMode === 'immediate') {
-      this.defineWatch('searchParam', this.refreshTable, { deep: true }, 1000)
-    }
   },
   methods: {
-    /** *
-     * defineSearchParam 定义searchParam
-     */
     defineSearchParam () {
       this.searchParam = this.searchs.reduce((prev, item) => {
         prev[item.key] = item.value ?? ''
         return prev
       }, {})
     },
-    /** *
-     * syncProp 同步prop数据
-     */
     syncProp () {
       const { pageSize, currentPage } = this
       this.internalPageSize = pageSize
       this.internalCurrentPage = currentPage
     },
-    /** *
-     * createPropSnap 创建prop快照
-     */
     createPropSnap () {
       const { searchParam, pageSize, currentPage } = this
       this.searchParamSnap = depClone(searchParam)
       this.pageSizeSnap = pageSize
       this.currentPageSnap = currentPage
     },
-    /** * 定义数据观察 defineWatch
-     * @param {Stirng|Function} expOrFn 监听字段
-     */
-    defineWatch (expOrFn, cb, option, wait) {
-      this.$watch(expOrFn, debounce(cb, wait), option)
+    updateSearchParam (searchParam) {
+      Object.assign(this.searchParam, searchParam)
     },
-    /** *
-     * updatePageSize 更新pageSize
-     * @param {Number} pageSize
-     */
     updatePageSize (pageSize) {
-      if (pageSize > 0) {
-        this.internalPageSize = pageSize
-        this.$emit('update:pageSize', pageSize)
-      }
+      this.internalPageSize = pageSize
+      this.$emit('update:pageSize', pageSize)
     },
-    /** *
-     * updateCurrentPage 更新currentPage
-     * @param {Number} currentPage
-     */
     updateCurrentPage (currentPage) {
-      if (currentPage > 0) {
-        this.internalCurrentPage = currentPage
-        this.$emit('update:currentPage', currentPage)
-      }
+      this.internalCurrentPage = currentPage
+      this.$emit('update:currentPage', currentPage)
     },
-    /** *
-     * handleSizeChange 处理pageSize变化
-     * @param {Number} val 当前pageSize
-     */
     handleSizeChange (val) {
       this.updatePageSize(val)
       this.refreshTable()
     },
-    /** *
-     * handleCurrentChange 处理currentPage变化
-     * @param {Number} val 当前currentPage
-     */
     handleCurrentChange (val) {
       this.updateCurrentPage(val)
       this.refreshTable()
     },
-    /** *
-     * updateSearchParam 重置searchs查询参数
-     * @param {Object} searchParam 更新查询字段
-     */
-    updateSearchParam (searchParam) {
-      Object.assign(this.searchParam, searchParam)
+    handleSelectionChange (val) {
+      this.multipleSelection = val
     },
-    /** *
-     * findBindComponent 查找绑定组件
-     */
     findBindComponent () {
       const componentName = this.bindComponentName
       if (componentName) { this.bindComponent = findComponentUpward(this, componentName) }
     },
-    /** *
-     * notifyRequest 通知请求
-     */
     notifyRequest () {
       const param = depClone(this.searchParam)
       param.pageSize = this.internalPageSize
@@ -380,34 +368,26 @@ export default {
 
       this.$emit('request-trigger', param)
     },
-    /** *
-     * triggerCallback 事件触发器
-     * @param {Object} option 按钮配置项
-     * @param {Object|Array} data 列表数据
-     * @param {Number|Undefined} index 当前操作数据索引
-     */
     triggerCallback (option, data, index) {
       const cb = this.bindComponent?.[option.handle] ?? findComponentMethodUpward(this, option.handle)
       if (!cb) { return }
       cb(option, data ? depClone(data) : data, index)
     },
-    /** *
-     * refreshTable 刷新table，可供外部调用
-     * @param {Object} param 合并参数
-     * @param {Boolean} isReset 是否重置参数
-     */
     refreshTable (param, isReset) {
       param = isObject(param) ? param : {}
       let { pageSize, currentPage, ...searchParam } = param
       searchParam = isReset ? { ...this.searchParamSnap, searchParam } : searchParam
-      pageSize = pageSize || (isReset ? this.pageSizeSnap : undefined)
-      currentPage = currentPage || (isReset ? this.currentPageSnap : undefined)
+      pageSize = pageSize || (isReset ? this.pageSizeSnap : this.internalPageSize)
+      currentPage = currentPage || (isReset ? this.currentPageSnap : this.internalCurrentPage)
 
       this.updateSearchParam(searchParam)
       this.updatePageSize(pageSize)
       this.updateCurrentPage(currentPage)
 
       this.notifyRequest()
+    },
+    getChecked () {
+      return depClone(this.multipleSelection)
     }
   }
 }
@@ -442,9 +422,16 @@ export default {
       align-items: center;
       justify-content: space-between;
       margin-bottom: 18px;
+      .toolbar-option {
+        display: flex;
+        align-items: center;
+      }
     }
     .el-table {
       margin-bottom: 18px;
+      /deep/ .el-radio__label {
+        padding-left: 0;
+      }
     }
     &-pagination {
       display: flex;

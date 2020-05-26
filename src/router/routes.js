@@ -59,6 +59,11 @@ export const asyncRoutes = [
         path: 'tree-transfer',
         title: '树形穿梭框',
         component: () => import('@/pages/components/tree-transfer')
+      },
+      {
+        path: 'performance',
+        title: '性能分析',
+        component: () => import('@/pages/components/performance')
       }
     ]
   },
@@ -152,6 +157,20 @@ export const asyncRoutes = [
         path: '401',
         title: '401',
         component: () => import('@/pages/error-page/401')
+      }
+    ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    title: '系统管理',
+    icon: 'setting-fill',
+    alwaysShow: true,
+    children: [
+      {
+        path: 'menu-manage',
+        title: '菜单管理',
+        component: () => import('@/pages/system/menu-manage')
       }
     ]
   },
