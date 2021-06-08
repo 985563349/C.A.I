@@ -1,5 +1,5 @@
 import { RouteRecordRaw } from 'vue-router';
-import Layout from '../layout/index.vue';
+import Layout from '@/layout/index.vue';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -9,7 +9,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: 'welcome',
-        component: () => import('../pages/welcome.vue'),
+        component: () => import('@/pages/welcome.vue'),
       },
     ],
   },
@@ -20,13 +20,13 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: 'index',
-        component: () => import('../pages/table.vue'),
+        component: () => import('@/pages/table.vue'),
       },
     ],
   },
   {
     path: '/sign-in',
-    component: () => import('../pages/sign-in.vue'),
+    component: () => import('@/pages/sign-in.vue'),
   },
 ];
 
