@@ -1,11 +1,25 @@
-import { Module } from 'vuex';
+import type { Module } from 'vuex';
+import type { RootState } from '@/store';
 
-const user: Module<Store.UserState, Store.RootState> = {
+export interface UserState {
+  token: string;
+  currentUser: {
+    username: string;
+  } | null;
+}
+
+const user: Module<UserState, RootState> = {
   namespaced: true,
 
   state: {
     token: '',
     currentUser: null,
+  },
+
+  getters: {
+    token: (state) => state.token,
+
+    currentUser: (state) => state.currentUser,
   },
 
   mutations: {
